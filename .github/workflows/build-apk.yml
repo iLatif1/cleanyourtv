@@ -1,3 +1,4 @@
+# Manual build of the launcher APK (run from the Actions tab)
 name: Build launcher APK
 on: workflow_dispatch
 jobs:
