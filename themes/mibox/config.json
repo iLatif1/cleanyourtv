@@ -1,0 +1,12 @@
+{
+  "dock_apps": [
+    "com.mbm_soft.aroma4kitv",
+    "com.google.android.youtube.tv",
+    "net.mbc.shahidTV",
+    "com.amazon.amazonvideo.livingroom",
+    "com.apple.atve.androidtv.appletv"
+  ],
+  "columns": 5,
+  "live_tv_package": "",
+  "vpn_app": "com.windscribe.vpn"
+}
