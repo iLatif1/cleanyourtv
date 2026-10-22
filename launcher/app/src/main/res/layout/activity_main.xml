@@ -239,6 +239,20 @@
                         android:layout_marginBottom="9dp"
                         android:orientation="vertical">
 
+                        <!-- Hijri date ("27 Ramadan 1447"), shown when hijri_date is on. -->
+                        <TextView
+                            android:id="@+id/hijriDate"
+                            android:gravity="left"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:singleLine="true"
+                            android:ellipsize="end"
+                            android:textColor="#E6FFFFFF"
+                            android:textSize="17sp"
+                            android:textDirection="locale"
+                            android:includeFontPadding="false"
+                            android:visibility="gone" />
+
                         <!-- Shamsi date ("27 Mehr 1405"), shown when shamsi_date is on. -->
                         <TextView
                             android:id="@+id/shamsiDate"
@@ -290,6 +304,81 @@
                 android:textColor="#D9FFFFFF"
                 android:textSize="14sp"
                 android:fontFamily="@font/outfit_medium"
+                android:letterSpacing="0.04"
+                android:focusable="false"
+                android:visibility="gone" />
+
+            <!-- Current weather (config.xml, weather_enabled), e.g. "28° · Overcast". Gone until the
+                 first successful fetch. -->
+            <TextView
+                android:id="@+id/weatherText"
+                android:layout_width="wrap_content"
+                android:layout_below="@id/stats"
+                android:layout_alignStart="@id/leftBlock"
+                android:gravity="left"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:singleLine="true"
+                android:ellipsize="end"
+                android:textColor="#D9FFFFFF"
+                android:textSize="14sp"
+                android:textDirection="locale"
+                android:focusable="false"
+                android:visibility="gone" />
+
+            <!-- Today's five prayer times (config.xml, prayer_times_enabled), computed offline. -->
+            <TextView
+                android:id="@+id/prayerTimesText"
+                android:layout_width="wrap_content"
+                android:layout_below="@id/weatherText"
+                android:layout_alignStart="@id/leftBlock"
+                android:gravity="left"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:singleLine="true"
+                android:ellipsize="end"
+                android:textColor="#B3FFFFFF"
+                android:textSize="13sp"
+                android:textDirection="locale"
+                android:focusable="false"
+                android:visibility="gone" />
+
+            <!-- Hadith of the day (config.xml, hadith_enabled): the Arabic text as narrated, or its English
+                 translation outside Arabic locales, with its source. Full width so a long one wraps instead
+                 of running under the grid; no custom font, so the system's own Arabic shaping and tashkeel
+                 (diacritic) positioning apply, which @font/outfit does not cover. -->
+            <TextView
+                android:id="@+id/hadithText"
+                android:layout_width="match_parent"
+                android:layout_below="@id/prayerTimesText"
+                android:layout_alignStart="@id/leftBlock"
+                android:gravity="left"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:layout_marginEnd="40dp"
+                android:maxLines="3"
+                android:ellipsize="end"
+                android:lineSpacingExtra="4dp"
+                android:textColor="#CCFFFFFF"
+                android:textSize="15sp"
+                android:textDirection="locale"
+                android:focusable="false"
+                android:visibility="gone" />
+
+            <!-- The hadith's source line ("Sahih al-Bukhari 1" or, in Arabic, "رواه البخاري ١"). -->
+            <TextView
+                android:id="@+id/hadithSource"
+                android:layout_width="wrap_content"
+                android:layout_below="@id/hadithText"
+                android:layout_alignStart="@id/leftBlock"
+                android:gravity="left"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:singleLine="true"
+                android:ellipsize="end"
+                android:textColor="#80FFFFFF"
+                android:textSize="12sp"
+                android:textDirection="locale"
                 android:letterSpacing="0.04"
                 android:focusable="false"
                 android:visibility="gone" />

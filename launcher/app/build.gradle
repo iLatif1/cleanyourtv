@@ -61,4 +61,8 @@ dependencies {
     implementation 'androidx.dynamicanimation:dynamicanimation:1.0.0'
     // Test only (never in the APK): plain JVM tests for the module card validators, src/test.
     testImplementation 'junit:junit:4.13.2'
+    // Test only: Android's org.json is a build-time stub outside an emulator, so WeatherTest needs a
+    // real implementation to parse the sample response; Weather.java itself still calls the platform's
+    // own org.json (already in every Android build) and ships no dependency of its own.
+    testImplementation 'org.json:json:20231013'
 }

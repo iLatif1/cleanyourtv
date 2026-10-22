@@ -150,6 +150,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
     /** The pills have been filled in once; later resumes refresh them after the first frame. */
     private boolean pillsShown;
     private TextView shamsiDate;
+    private TextView hijriDate;
+    private TextView weatherText;
+    private TextView prayerTimesText;
+    private TextView hadithText;
+    private TextView hadithSource;
     private TextView stats;
     private List<RaceWeekend.Race> raceCalendar;
     private View racePanel;
@@ -157,6 +162,13 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
     /** config.xml show_stats, overridable by a theme. Off: the line is gone and nothing is read. */
     private boolean showStats;
     private boolean shamsi;
+    private boolean hijri;
+    private boolean hadithOn;
+    private boolean prayerTimesOn;
+    private boolean weatherOn;
+    /** Where the TV is (config.xml latitude/longitude), for the weather fetch and the prayer-time maths;
+     * NaN when either is empty, which also keeps weatherOn/prayerTimesOn from doing anything. */
+    private double latitude = Double.NaN, longitude = Double.NaN;
     /** greeting_name: said after the greeting, which is shown in capitals. */
     private String greetingName = "";
     /** Optional time-of-day backdrop (config.xml, sky_intensity); 0 keeps it hidden. */
@@ -356,6 +368,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
         greetingColor = greeting.getCurrentTextColor();
         btnWifi = findViewById(R.id.btnWifi);
         shamsiDate = findViewById(R.id.shamsiDate);
+        hijriDate = findViewById(R.id.hijriDate);
+        weatherText = findViewById(R.id.weatherText);
+        prayerTimesText = findViewById(R.id.prayerTimesText);
+        hadithText = findViewById(R.id.hadithText);
+        hadithSource = findViewById(R.id.hadithSource);
         stats = findViewById(R.id.stats);
         raceCalendar = cfg.raceCalendar;
         racePanel = findViewById(R.id.racePanel);
@@ -370,6 +387,23 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
             TextView date = findViewById(R.id.date);
             date.setTextSize(11f);
             date.setPadding(0, (int) (4 * density), 0, 0);
+        }
+        hijri = cfg.hijriDate;
+        hadithOn = cfg.hadithEnabled;
+        prayerTimesOn = cfg.prayerTimesEnabled;
+        weatherOn = cfg.weatherEnabled;
+        try {
+            latitude = Double.parseDouble(getString(R.string.latitude));
+            longitude = Double.parseDouble(getString(R.string.longitude));
+        } catch (NumberFormatException ignored) {
+            // empty (the default) or not a number: weather and prayer times both stay off, same as the sky.
+        }
+        if (hijri) hijriDate.setVisibility(View.VISIBLE);
+        if (hadithOn) showHadith();
+        if (prayerTimesOn && !Double.isNaN(latitude)) showPrayerTimes();
+        if (weatherOn && !Double.isNaN(latitude)) {
+            Weather.Reading cached = Weather.cached(Weather.file(this));
+            if (cached != null) showWeather(cached);
         }
         vpnApp = cfg.vpnApp;
         moduleCards = cfg.moduleCards;
@@ -658,6 +692,10 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
         rebuildOnResume = false;
         updateGreeting();
         updateRace();
+        // The day may have rolled over while Home was backgrounded: both change at most once a day.
+        if (hadithOn) showHadith();
+        if (prayerTimesOn && !Double.isNaN(latitude)) showPrayerTimes();
+        if (weatherOn && !Double.isNaN(latitude)) startWeather();
         // The network and Inputs pills keep their state while Home is in the background, and callbacks update them
         // when the network or the inputs change, so this refresh only catches anything missed. Its binder calls
         // (about 7 ms on a TCL C755, most of it WifiManager.getConnectionInfo) would hold up the first frame back
@@ -793,6 +831,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
         heroArt.animate().cancel();
         handler.removeCallbacks(minuteTick);
         stopStats();
+        stopWeather();
         if (diya != null) diya.stop();
         cancelPendingFocusScroll();
         // Nothing of ours stays on screen over another app; an undecided prompt simply returns next time.
@@ -1930,6 +1969,88 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
             greeting.setTextColor(greetingColor);
         }
         if (shamsi) shamsiDate.setText(Shamsi.today());
+        if (hijri) hijriDate.setText(Hijri.today(isArabic()));
+    }
+
+    private boolean isArabic() {
+        return java.util.Locale.getDefault().getLanguage().equals("ar");
+    }
+
+    // ---- hadith of the day, prayer times, weather (config.xml hadith_enabled, prayer_times_enabled,
+    // weather_enabled) -------------------------------------------------------------------------------
+
+    private void showHadith() {
+        Hadith.Entry entry = Hadith.today();
+        boolean arabic = isArabic();
+        hadithText.setText(arabic ? entry.arabic : entry.english);
+        hadithText.setVisibility(View.VISIBLE);
+        hadithSource.setText(arabic ? entry.arabicSource : entry.englishSource);
+        hadithSource.setVisibility(View.VISIBLE);
+    }
+
+    private void showPrayerTimes() {
+        PrayerTimes.Times t = PrayerTimes.today(latitude, longitude, java.time.ZoneId.systemDefault());
+        if (t.fajr == null) return;   // the sun never reaches Fajr's angle here today (high-latitude summer)
+        boolean arabic = isArabic();
+        String[] names = arabic
+                ? new String[]{"الفجر", "الظهر", "العصر", "المغرب", "العشاء"}
+                : new String[]{"Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"};
+        Integer[] minutes = {t.fajr, t.dhuhr, t.asr, t.maghrib, t.isha};
+        StringBuilder line = new StringBuilder();
+        for (int i = 0; i < names.length; i++) {
+            if (minutes[i] == null) continue;
+            if (line.length() > 0) line.append("   ");
+            line.append(names[i]).append(' ').append(clockTime(minutes[i]));
+        }
+        prayerTimesText.setText(line);
+        prayerTimesText.setVisibility(View.VISIBLE);
+    }
+
+    private static String clockTime(int minutesAfterMidnight) {
+        int h = ((minutesAfterMidnight % 1440) + 1440) % 1440 / 60;
+        int m = ((minutesAfterMidnight % 1440) + 1440) % 1440 % 60;
+        return String.format(java.util.Locale.US, "%d:%02d", h == 0 ? 12 : h > 12 ? h - 12 : h, m);
+    }
+
+    private void showWeather(Weather.Reading reading) {
+        weatherText.setText(ClockScene.formatWeather(reading, isArabic()));
+        weatherText.setVisibility(View.VISIBLE);
+    }
+
+    /** Background reader, the same HandlerThread pattern as startStats/stopStats. Started only while
+     * Home is resumed and weather_enabled and latitude/longitude are set. */
+    private HandlerThread weatherThread;
+    private volatile Handler weatherBg;
+
+    private void startWeather() {
+        if (weatherThread != null) return;
+        weatherThread = new HandlerThread("weather");
+        weatherThread.start();
+        Handler bg = new Handler(weatherThread.getLooper());
+        weatherBg = bg;
+        File file = Weather.file(this);
+        bg.post(new Runnable() {
+            @Override
+            public void run() {
+                if (weatherBg != bg) return;
+                Weather.Reading cached = Weather.cached(file);
+                if (Weather.stale(cached)) {
+                    Weather.Reading fresh = Weather.refresh(file, latitude, longitude);
+                    if (fresh != null) handler.post(() -> {
+                        if (weatherOn && weatherBg == bg) showWeather(fresh);
+                    });
+                }
+                if (weatherBg == bg) bg.postDelayed(this, Weather.REFRESH_MS);
+            }
+        });
+    }
+
+    private void stopWeather() {
+        if (weatherThread == null) return;
+        weatherBg.removeCallbacksAndMessages(null);
+        weatherThread.quit();
+        weatherThread = null;
+        weatherBg = null;
     }
 
     // ---- race-weekend panel (a theme's race_calendar) -----------------------------------------------

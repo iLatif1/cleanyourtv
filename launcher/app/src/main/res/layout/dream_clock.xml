@@ -58,5 +58,56 @@
             android:fontFamily="@font/outfit_regular"
             android:letterSpacing="0.14"
             android:textAllCaps="true" />
+
+        <!-- Hijri date (config.xml, hijri_date), set once by ClockScene. -->
+        <TextView
+            android:id="@+id/dreamHijriDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="6dp"
+            android:layout_marginTop="2dp"
+            android:textColor="#8CFFFFFF"
+            android:textSize="18sp"
+            android:textDirection="locale"
+            android:letterSpacing="0.14"
+            android:visibility="gone" />
+
+        <!-- Current weather (config.xml, weather_enabled), the last cached reading; set once by ClockScene. -->
+        <TextView
+            android:id="@+id/dreamWeather"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="6dp"
+            android:layout_marginTop="16dp"
+            android:textColor="#B3FFFFFF"
+            android:textSize="16sp"
+            android:textDirection="locale" />
+
+        <!-- Hadith of the day (config.xml, hadith_enabled), set once by ClockScene; no custom font, so the
+             system's own Arabic shaping and tashkeel (diacritic) positioning apply. -->
+        <TextView
+            android:id="@+id/dreamHadith"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="6dp"
+            android:layout_marginTop="28dp"
+            android:maxWidth="780dp"
+            android:maxLines="4"
+            android:ellipsize="end"
+            android:lineSpacingExtra="6dp"
+            android:textColor="#CCFFFFFF"
+            android:textSize="20sp"
+            android:textDirection="locale" />
+
+        <TextView
+            android:id="@+id/dreamHadithSource"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="6dp"
+            android:layout_marginTop="6dp"
+            android:textColor="#80FFFFFF"
+            android:textSize="14sp"
+            android:textDirection="locale"
+            android:letterSpacing="0.04" />
     </LinearLayout>
 </FrameLayout>

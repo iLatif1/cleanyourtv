@@ -9,10 +9,11 @@
 
     <!-- Apps pinned to the dock row at the bottom, in this order. Missing apps are skipped. -->
     <string-array name="dock_apps">
-        <item>com.netflix.ninja</item>
-        <item>com.amazon.amazonvideo.livingroom</item>
+        <item>com.mbm_soft.aroma4kitv</item>
         <item>com.google.android.youtube.tv</item>
-        <item>in.startv.hotstar</item>
+        <item>net.mbc.shahidTV</item>
+        <item>com.amazon.amazonvideo.livingroom</item>
+        <item>com.apple.atve.androidtv.appletv</item>
     </string-array>
     <!-- With fewer dock_apps than columns (or a dock app that is not installed), the free dock slots take
          the first grid apps, so the dock never shows a gap. false leaves them empty (#162); a theme can
@@ -25,8 +26,9 @@
         <item>com.mitv.gallery</item>
     </string-array>
 
-    <!-- The TV's Live TV / tuner app, offered at the end of the Inputs menu. Leave empty to omit. -->
-    <string name="live_tv_package" translatable="false">com.mediatek.wwtv.tvcenter</string>
+    <!-- The TV's Live TV / tuner app, offered at the end of the Inputs menu. Leave empty to omit.
+         This box is a streaming box, no HDMI-in or tuner: left empty, the Inputs pill hides itself. -->
+    <string name="live_tv_package" translatable="false"></string>
 
     <!-- Some TVs give their Live TV app no leanback entry point at all, so `live_tv_package` above
          resolves to nothing (TCL Android TV 9 on China-market sets is one). This action is then sent
@@ -101,6 +103,21 @@
          Gregorian date. -->
     <bool name="shamsi_date">false</bool>
 
+    <!-- Hijri date (Umm al-Qura calendar, java.time, no network) above the Gregorian one, e.g. "27 Ramadan 1447". -->
+    <bool name="hijri_date">true</bool>
+    <!-- Hadith of the day on Home and the Clock screensaver, from a small bundled list (Hadith.java):
+         authentic hadiths from Sahih al-Bukhari and Sahih Muslim only, each with its source, rotating
+         daily. No network. -->
+    <bool name="hadith_enabled">true</bool>
+    <!-- Today's five prayer times on Home, computed offline (PrayerTimes.java): Umm al-Qura method, Fajr at
+         18.5 degrees, Asr by the Shafi'i shadow rule, Isha 90 minutes after Maghrib (120 in Ramadan). Uses
+         latitude/longitude below. No network. -->
+    <bool name="prayer_times_enabled">true</bool>
+    <!-- Current weather on Home and the Clock screensaver, from Open-Meteo (no account or key), fetched at
+         most once an hour while Home is on screen and cached for when there is no network. Uses
+         latitude/longitude below. Needs the INTERNET permission; everything else in this launcher needs none. -->
+    <bool name="weather_enabled">true</bool>
+
     <!-- A name after the greeting: "Mr. Trịnh" shows GOOD MORNING, MR. TRỊNH. Empty: the greeting alone. -->
     <string name="greeting_name" translatable="false"></string>
     <!-- Optional VPN app the network pill opens (hold the pill for Wi-Fi settings), e.g. the package of the
@@ -143,7 +160,7 @@
 
     <!-- Tiles per row in the grid; the dock always has this many slots. Tiles are 180dp wide at 4 columns and
          shrink to fit from 5 up (about 144dp at 5, 117dp at 6 on a 1080p TV). -->
-    <integer name="columns">4</integer>
+    <integer name="columns">5</integer>
 
     <!-- Basic motion is on; advanced effects are opt-in in the launcher's own Settings screen. -->
     <bool name="animations">true</bool>
@@ -175,11 +192,12 @@
          sets its opacity. Around 60 reads clearly without hiding a wallpaper. Can also be set with
          "sky_intensity": 60 in a theme's config.json. -->
     <integer name="sky_intensity">0</integer>
-    <!-- Where the TV is, in decimal degrees, so the sky's sunrise and sunset glows follow the real sun
-         (computed on the TV, no network). Empty: a fixed temperate day, sunset glow around 19:00.
-         Vilnius: 54.69 and 25.28. -->
-    <string name="latitude" translatable="false"></string>
-    <string name="longitude" translatable="false"></string>
+    <!-- Where the TV is, in decimal degrees: the sky's sunrise and sunset glows, the weather, and the
+         prayer times all follow this (all computed on or fetched for this place, nothing reads it
+         elsewhere). Empty: a fixed temperate day for the sky, and weather/prayer times stay off even if
+         their own flags are on. Madinah: 24.4672 and 39.6111. -->
+    <string name="latitude" translatable="false">24.4672</string>
+    <string name="longitude" translatable="false">39.6111</string>
 
     <!-- Cinematic top shelf: the focused dock app's artwork, softened, fills the top of the screen in its
          colour; the shelf gets a larger name, a "Last opened" line (from the apps Home opened) and dock position

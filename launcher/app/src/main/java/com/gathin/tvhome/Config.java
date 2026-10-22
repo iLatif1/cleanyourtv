@@ -62,6 +62,14 @@ final class Config {
     final boolean advancedEffects;
     final int rowsBelowDock;
     final boolean shamsiDate;
+    /** Hijri date above (or beside) the Gregorian one, from java.time's Umm al-Qura calendar (config.xml, hijri_date). */
+    final boolean hijriDate;
+    /** Hadith of the day on Home and the Clock screensaver, from the bundled list (config.xml, hadith_enabled). */
+    final boolean hadithEnabled;
+    /** Today's prayer times on Home, computed offline, Umm al-Qura method (config.xml, prayer_times_enabled). */
+    final boolean prayerTimesEnabled;
+    /** Current weather on Home and the Clock screensaver, from Open-Meteo (config.xml, weather_enabled). */
+    final boolean weatherEnabled;
     /** Name after the greeting ("Good morning, Mr. Trịnh"); empty for the greeting alone. */
     final String greetingName;
     final boolean moduleCards;
@@ -138,7 +146,8 @@ final class Config {
                    int[] settingsKeycodes, boolean settingsKeyPanel, boolean wallpaperEnabled, File wallpaper, List<File> wallpapers,
                    int wallpaperRotationMinutes, int wallpaperDim, String wallpaperOrder, boolean overlayApplied,
                    Festival festival, int[] inputKeycodes, List<String> appKeys,
-                   List<RaceWeekend.Race> raceCalendar, boolean cinematicHome, boolean ambientGlow, int homeIdleClockMinutes) {
+                   List<RaceWeekend.Race> raceCalendar, boolean cinematicHome, boolean ambientGlow, int homeIdleClockMinutes,
+                   boolean hijriDate, boolean hadithEnabled, boolean prayerTimesEnabled, boolean weatherEnabled) {
         this.inputKeycodes = inputKeycodes;
         this.appKeys = Collections.unmodifiableList(appKeys);
         this.dockApps = Collections.unmodifiableList(dockApps);
@@ -189,6 +198,10 @@ final class Config {
         this.cinematicHome = cinematicHome;
         this.ambientGlow = ambientGlow;
         this.homeIdleClockMinutes = homeIdleClockMinutes;
+        this.hijriDate = hijriDate;
+        this.hadithEnabled = hadithEnabled;
+        this.prayerTimesEnabled = prayerTimesEnabled;
+        this.weatherEnabled = weatherEnabled;
     }
 
     /** The folder the theme tools push into; null when external storage is unavailable. */
@@ -214,6 +227,10 @@ final class Config {
         boolean animations = res.getBoolean(R.bool.animations);
         boolean advancedEffects = res.getBoolean(R.bool.advanced_effects);
         boolean shamsi = res.getBoolean(R.bool.shamsi_date);
+        boolean hijri = res.getBoolean(R.bool.hijri_date);
+        boolean hadith = res.getBoolean(R.bool.hadith_enabled);
+        boolean prayerTimes = res.getBoolean(R.bool.prayer_times_enabled);
+        boolean weather = res.getBoolean(R.bool.weather_enabled);
         String greetingName = res.getString(R.string.greeting_name).trim();
         boolean moduleCards = res.getBoolean(R.bool.module_cards);
         boolean reducedMotion = res.getBoolean(R.bool.reduced_motion);
@@ -263,6 +280,10 @@ final class Config {
             animations = bool(json, "animations", animations);
             advancedEffects = bool(json, "advanced_effects", advancedEffects);
             shamsi = bool(json, "shamsi_date", shamsi);
+            hijri = bool(json, "hijri_date", hijri);
+            hadith = bool(json, "hadith_enabled", hadith);
+            prayerTimes = bool(json, "prayer_times_enabled", prayerTimes);
+            weather = bool(json, "weather_enabled", weather);
             greetingName = string(json, "greeting_name", greetingName).trim();
             moduleCards = bool(json, "module_cards", moduleCards);
             reducedMotion = bool(json, "reduced_motion", reducedMotion);
@@ -347,7 +368,7 @@ final class Config {
                 Math.max(0, Math.min(100, skyIntensity)), settingsKeycodes, settingsKeyPanel, wallpaperEnabled, wallpaper,
                 wallpapers, rotationMinutes, wallpaperDim, wallpaperOrder, applied,
                 festival, inputKeycodes, appKeys, json == null ? Collections.emptyList() : raceCalendar(json), cinematic, ambientGlow,
-                Math.max(0, idleClockMinutes));
+                Math.max(0, idleClockMinutes), hijri, hadith, prayerTimes, weather);
     }
 
     /**

@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Arabic screensaver: right-aligned clock/date, RTL date text, LTR time numerals. Same mirroring as
+     layout-iw/dream_clock.xml (Hebrew). -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FF000000">
+
+    <View
+        android:id="@+id/dreamAmbient"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <LinearLayout
+        android:id="@+id/dreamContent"
+        android:layoutDirection="rtl"
+        android:gravity="right"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layoutDirection="ltr"
+            android:baselineAligned="true">
+
+            <TextClock
+                android:id="@+id/dreamAmPm"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="10dp"
+                android:format12Hour="a"
+                android:format24Hour=""
+                android:textColor="#99FFFFFF"
+                android:textSize="22sp"
+                android:fontFamily="@font/outfit_medium"
+                android:letterSpacing="0.08"
+                android:textAllCaps="true" />
+
+            <TextClock
+                android:id="@+id/dreamClock"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:format12Hour="h:mm"
+                android:format24Hour="HH:mm"
+                android:textColor="#E6FFFFFF"
+                android:textSize="120sp"
+                android:fontFamily="@font/outfit_extralight"
+                android:letterSpacing="-0.04"
+                android:includeFontPadding="false" />
+        </LinearLayout>
+
+        <TextClock
+            android:id="@+id/dreamDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:textDirection="rtl"
+            android:gravity="right"
+            android:format12Hour="@string/date_format"
+            android:format24Hour="@string/date_format"
+            android:textColor="#8CFFFFFF"
+            android:textSize="18sp"
+            android:fontFamily="@font/outfit_regular"
+            android:letterSpacing="0.14"
+            android:textAllCaps="true" />
+
+        <!-- Hijri date (config.xml, hijri_date), set once by ClockScene. -->
+        <TextView
+            android:id="@+id/dreamHijriDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:gravity="right"
+            android:textColor="#8CFFFFFF"
+            android:textSize="18sp"
+            android:textDirection="locale"
+            android:letterSpacing="0.14"
+            android:visibility="gone" />
+
+        <!-- Current weather (config.xml, weather_enabled), the last cached reading; set once by ClockScene. -->
+        <TextView
+            android:id="@+id/dreamWeather"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:gravity="right"
+            android:textColor="#B3FFFFFF"
+            android:textSize="16sp"
+            android:textDirection="locale" />
+
+        <!-- Hadith of the day (config.xml, hadith_enabled), set once by ClockScene; no custom font, so the
+             system's own Arabic shaping and tashkeel (diacritic) positioning apply. -->
+        <TextView
+            android:id="@+id/dreamHadith"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="28dp"
+            android:maxWidth="780dp"
+            android:maxLines="4"
+            android:ellipsize="end"
+            android:gravity="right"
+            android:lineSpacingExtra="6dp"
+            android:textColor="#CCFFFFFF"
+            android:textSize="20sp"
+            android:textDirection="locale" />
+
+        <TextView
+            android:id="@+id/dreamHadithSource"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:gravity="right"
+            android:textColor="#80FFFFFF"
+            android:textSize="14sp"
+            android:textDirection="locale"
+            android:letterSpacing="0.04" />
+    </LinearLayout>
+</FrameLayout>

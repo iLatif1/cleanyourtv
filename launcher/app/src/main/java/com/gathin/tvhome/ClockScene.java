@@ -2,11 +2,14 @@ package com.gathin.tvhome;
 
 import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;
+import android.content.Context;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Handler;
 import android.os.Looper;
 import android.view.View;
+import android.widget.TextView;
 
+import java.util.Locale;
 import java.util.Random;
 
 /**
@@ -47,6 +50,53 @@ final class ClockScene {
                 glow.setGradientRadius((r - l) * 0.55f));
         colorIndex = random.nextInt(PALETTE.length);
         setGlow(PALETTE[colorIndex]);
+        showIslamicContent(root);
+    }
+
+    /**
+     * Hijri date, weather (the last cached reading; the screensaver never touches the network itself)
+     * and hadith of the day, set once: none of these change while the screensaver is up. Views the
+     * layout for this locale does not have (every locale but Arabic and the default) are simply absent,
+     * so this is a no-op there.
+     */
+    private void showIslamicContent(View root) {
+        Context ctx = root.getContext();
+        Config cfg = Config.load(ctx);
+        boolean arabic = Locale.getDefault().getLanguage().equals("ar");
+
+        TextView hijri = root.findViewById(R.id.dreamHijriDate);
+        if (hijri != null && cfg.hijriDate) {
+            hijri.setText(Hijri.today(arabic));
+            hijri.setVisibility(View.VISIBLE);
+        }
+
+        TextView weather = root.findViewById(R.id.dreamWeather);
+        if (weather != null && cfg.weatherEnabled) {
+            Weather.Reading reading = Weather.cached(Weather.file(ctx));
+            if (reading != null) {
+                weather.setText(formatWeather(reading, arabic));
+                weather.setVisibility(View.VISIBLE);
+            }
+        }
+
+        if (cfg.hadithEnabled) {
+            TextView hadith = root.findViewById(R.id.dreamHadith);
+            TextView source = root.findViewById(R.id.dreamHadithSource);
+            if (hadith != null) {
+                Hadith.Entry entry = Hadith.today();
+                hadith.setText(arabic ? entry.arabic : entry.english);
+                hadith.setVisibility(View.VISIBLE);
+                if (source != null) {
+                    source.setText(arabic ? entry.arabicSource : entry.englishSource);
+                    source.setVisibility(View.VISIBLE);
+                }
+            }
+        }
+    }
+
+    static String formatWeather(Weather.Reading r, boolean arabic) {
+        String temp = Math.round(r.temperatureC) + "°";
+        return temp + " · " + Weather.description(r.weatherCode, arabic);
     }
 
     void start() {
