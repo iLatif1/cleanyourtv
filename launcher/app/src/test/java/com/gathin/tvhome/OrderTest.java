@@ -2,6 +2,9 @@ package com.gathin.tvhome;
 
 import org.junit.Test;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -71,5 +74,20 @@ public class OrderTest {
             return c != 0 ? c : Integer.compare(usual.indexOf(x), usual.indexOf(y));
         });
         assertEquals(Arrays.asList("c/.C", "a/.A", "m/.M", "n/.N"), tiles);
+    }
+
+    @Test
+    public void resetDeletesAnExistingFile() throws IOException {
+        File f = File.createTempFile("order", ".txt");
+        Files.write(f.toPath(), "tvhome-order 1\ndock x\na/.A\n".getBytes());
+        assertTrue(Order.reset(f));
+        assertTrue(!f.exists());
+    }
+
+    @Test
+    public void resetIsFineWithNoFile() {
+        File f = new File(System.getProperty("java.io.tmpdir"), "no-such-order-file.txt");
+        assertTrue(!f.exists());
+        assertTrue(Order.reset(f));
     }
 }

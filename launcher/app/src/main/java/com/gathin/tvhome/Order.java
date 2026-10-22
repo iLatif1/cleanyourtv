@@ -108,6 +108,12 @@ final class Order {
         }
     }
 
+    /** Deletes the saved order (Launcher settings, "Reset app order"). True when there is none left,
+     * whether it was already gone or just removed. */
+    static boolean reset(File file) {
+        return !file.exists() || file.delete();
+    }
+
     /** Writes the order atomically. False (and a log line) when the write failed. */
     static boolean save(File file, Order order) {
         AtomicFile af = new AtomicFile(file);

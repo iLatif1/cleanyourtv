@@ -1828,6 +1828,13 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
         return true;
     }
 
+    @Override
+    public void onTileLongPressed(int position, View card) {
+        // dispatchKeyEvent swallows OK (down and up) while reordering or editing the dock, so a
+        // long-press cannot land here then.
+        showTileMenu(position, card);
+    }
+
     @Override public void onLibraryFocused() {
         libraryFocusPending = false;
         hideGlass();
@@ -2576,6 +2583,66 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
             action.run();
         });
         rows.addView(row);
+    }
+
+    /** A tile's own long-press menu: Move (when at least one other tile can swap places with it) and App info. */
+    private void showTileMenu(int position, View anchor) {
+        String pkg = adapter.packageAt(position);
+        if (pkg == null) return;
+        View panel = getLayoutInflater().inflate(R.layout.popup_inputs, root, false);
+        LinearLayout rows = panel.findViewById(R.id.rows);
+        PopupWindow popup = glassPopup(panel, (int) (200 * density));
+        if (position < adapter.movableCount() && adapter.movableCount() >= 2) {
+            addSettingsMenuRow(rows, popup, R.string.move, () -> startMovingTile(position));
+        }
+        addSettingsMenuRow(rows, popup, R.string.library_app_info, () -> openAppInfo(pkg));
+        panel.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
+        int width = Math.max((int) (200 * density), panel.getMeasuredWidth());
+        popup.setWidth(width);
+        // Unlike the top-bar menus (always near the top), a tile can be anywhere, including the dock
+        // at the very bottom of the screen: grow the menu upward instead of below it when below would clip.
+        int gap = (int) (10 * density);
+        int[] anchorLoc = new int[2];
+        anchor.getLocationOnScreen(anchorLoc);
+        int[] rootLoc = new int[2];
+        root.getLocationOnScreen(rootLoc);
+        boolean rtl = getResources().getBoolean(R.bool.rtl_menu_bar);
+        int x = rtl ? anchorLoc[0] + anchor.getWidth() - width : anchorLoc[0];
+        x = Math.max(rootLoc[0], Math.min(x, rootLoc[0] + root.getWidth() - width));
+        int below = anchorLoc[1] + anchor.getHeight() + gap;
+        boolean fitsBelow = below + panel.getMeasuredHeight() <= rootLoc[1] + root.getHeight();
+        int y = fitsBelow ? below : anchorLoc[1] - panel.getMeasuredHeight() - gap;
+        panel.setAlpha(0f);
+        panel.setPivotY(fitsBelow ? 0f : panel.getMeasuredHeight());
+        panel.setScaleY(0.92f);
+        panel.setTranslationY(fitsBelow ? -8 * density : 8 * density);
+        popup.showAtLocation(root, Gravity.TOP | Gravity.START, x, y);
+        panel.animate().alpha(1f).scaleY(1f).translationY(0f).setDuration(220)
+                .setInterpolator(new android.view.animation.DecelerateInterpolator(1.6f)).start();
+        rows.getChildAt(0).requestFocus();
+    }
+
+    private void openAppInfo(String pkg) {
+        try {
+            startActivity(new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:" + pkg))
+                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+        } catch (ActivityNotFoundException ignored) {
+        }
+    }
+
+    /**
+     * "Move" on a tile's own long-press menu: starts (or, already on, reuses) reorder mode with this
+     * tile already picked up, so the owner does not have to navigate back to it first.
+     */
+    private void startMovingTile(int position) {
+        String key = adapter.keyAt(position);
+        if (key == null) return;
+        if (!reordering && !beginReorder()) return;
+        int pos = adapter.positionOf(key);   // beginReorder() can reload tiles (empty dock slots removed)
+        if (pos < 0) return;
+        focusTile(pos);
+        pickUp(pos);
+        Toast.makeText(this, R.string.reorder_hint, Toast.LENGTH_LONG).show();
     }
 
     // ---- launcher settings and module cards -------------------------------------------------------

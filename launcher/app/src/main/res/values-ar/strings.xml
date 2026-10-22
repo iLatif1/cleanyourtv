@@ -67,6 +67,11 @@
     <string name="reorder">إعادة ترتيب التطبيقات</string>
     <string name="reorder_hint">اضغط موافق لالتقاط تطبيق، والأسهم لتحريكه، ورجوع لتثبيته. اضغط رجوع مرة أخرى للإنهاء.</string>
     <string name="reorder_not_saved">تعذّر حفظ الترتيب الجديد</string>
+    <string name="move">نقل</string>
+    <string name="reset_order">إعادة ضبط ترتيب التطبيقات</string>
+    <string name="reset_order_hint">يعيد تطبيقات اللوحة والشبكة إلى ترتيبها الافتراضي.</string>
+    <string name="reset_order_done">تمت إعادة ضبط ترتيب التطبيقات</string>
+    <string name="reset_order_failed">تعذّرت إعادة ضبط ترتيب التطبيقات</string>
     <string name="app_library">مكتبة التطبيقات</string>
     <string name="library_empty">لم يتم العثور على تطبيقات قابلة للتشغيل</string>
     <string name="library_on_home">على الرئيسية</string>

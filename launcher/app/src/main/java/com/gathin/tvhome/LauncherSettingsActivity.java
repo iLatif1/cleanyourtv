@@ -106,6 +106,14 @@ public final class LauncherSettingsActivity extends Activity {
             setResult(RESULT_OK);
             refresh();
         });
+        findViewById(R.id.resetOrderChoice).setOnClickListener(v -> {
+            if (Order.reset(Order.file(this))) {
+                Toast.makeText(this, R.string.reset_order_done, Toast.LENGTH_SHORT).show();
+                setResult(RESULT_OK);
+            } else {
+                Toast.makeText(this, R.string.reset_order_failed, Toast.LENGTH_SHORT).show();
+            }
+        });
         findViewById(R.id.defaultHomeChoice).setOnClickListener(v -> {
             Toast.makeText(this, R.string.home_settings_help, Toast.LENGTH_LONG).show();
             open(new Intent(Settings.ACTION_HOME_SETTINGS));
