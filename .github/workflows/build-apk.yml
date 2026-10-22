@@ -1,5 +1,7 @@
 name: Build launcher APK
 on: workflow_dispatch
+permissions:
+  contents: read
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -12,8 +14,17 @@ jobs:
       - uses: android-actions/setup-android@v3
         with:
           packages: platforms;android-34 build-tools;34.0.0
+      - name: Decode the release keystore
+        env:
+          KS_B64: ${{ secrets.RELEASE_KEYSTORE_B64 }}
+        run: echo "$KS_B64" | base64 -d > "$RUNNER_TEMP/release.keystore"
       - name: Build release APK
         working-directory: launcher
+        env:
+          RELEASE_KEYSTORE_PATH: ${{ runner.temp }}/release.keystore
+          RELEASE_KEYSTORE_PASSWORD: ${{ secrets.RELEASE_KEYSTORE_PASSWORD }}
+          RELEASE_KEY_ALIAS: ${{ secrets.RELEASE_KEY_ALIAS }}
+          RELEASE_KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
         run: |
           chmod +x gradlew
           ./gradlew assembleRelease -q --console=plain
