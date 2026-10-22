@@ -114,6 +114,23 @@ final class Order {
         return !file.exists() || file.delete();
     }
 
+    /**
+     * Restores a saved order from {@code order-import.txt} in the external files directory (the one
+     * {@code config.json} already uses, see {@link Config#dir}) into the real, private order file, then
+     * deletes the staging copy: a reinstall under a new signing key loses the old app's private storage,
+     * but {@code adb push} can still reach external storage, same as a theme push. A no-op, every launch,
+     * whenever that staging file is not there.
+     */
+    static void importStaged(Context ctx) {
+        File dir = Config.dir(ctx);
+        if (dir == null) return;
+        File staged = new File(dir, "order-import.txt");
+        if (!staged.isFile()) return;
+        Order order = load(staged);
+        if (order != null) save(file(ctx), order);
+        staged.delete();
+    }
+
     /** Writes the order atomically. False (and a log line) when the write failed. */
     static boolean save(File file, Order order) {
         AtomicFile af = new AtomicFile(file);
