@@ -1,0 +1,13 @@
+{
+  "dock_apps": [
+    "com.google.android.youtube.tv",
+    "net.mbc.shahidTV",
+    "com.mbm_soft.aroma4kitv",
+    "com.intigral.jawwytv",
+    "com.telfaz.ott"
+  ],
+  "columns": 5,
+  "live_tv_package": "com.tcl.tv",
+  "weather_enabled": true,
+  "hijri_date": true
+}
