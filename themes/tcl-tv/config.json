@@ -9,5 +9,11 @@
   "columns": 5,
   "live_tv_package": "com.tcl.tv",
   "weather_enabled": true,
-  "hijri_date": true
+  "hijri_date": true,
+  "app_keys": [
+    "172:com.tcl.tv"
+  ],
+  "hidden_apps": [
+    "com.tcl.waterfall.overseas"
+  ]
 }
