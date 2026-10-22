@@ -103,6 +103,8 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
      */
     private static final long TIME_VALID_AFTER_MS = 1_735_689_600_000L;
     private String liveTvPkg;
+    /** keycode -> package from app_keys (config or theme), so a button works with Home on screen even without InputKeyService. */
+    private Map<Integer, String> appKeys = Collections.emptyMap();
     /** Idle time on Home before ClockActivity; 0 is off (config.xml, home_idle_clock_minutes). */
     private long idleClockMs;
     private final Runnable showIdleClock = () -> startActivity(new Intent(this, ClockActivity.class));
@@ -316,6 +318,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
         festival = cfg.festival;
         festive = festival.active(LocalDate.now());
         liveTvPkg = cfg.liveTvPackage;
+        appKeys = RemoteKeys.parseAppKeys(cfg.appKeys);
         idleClockMs = cfg.homeIdleClockMinutes * MINUTE_MS;
         liveTvAction = cfg.liveTvAction;
         inputAction = cfg.inputAction;
@@ -867,6 +870,13 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
      * or switched off by a force-stop) the stock launcher that used to handle the key is gone, and the button did
      * nothing even on Home.
      */
+    private boolean handleAppKey(KeyEvent event) {
+        String pkg = appKeys.get(event.getKeyCode());
+        if (pkg == null) return false;
+        if (event.getAction() == KeyEvent.ACTION_UP && !event.isCanceled()) RemoteKeys.launch(this, pkg);
+        return true;
+    }
+
     private boolean handleSettingsKey(KeyEvent event) {
         for (int code : settingsKeycodes) {
             if (event.getKeyCode() != code) continue;
@@ -893,6 +903,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
      */
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
+        if (handleAppKey(event)) return true;
         if (handleSettingsKey(event)) return true;
         if (!reordering) return super.dispatchKeyEvent(event);
         if (dockEditing) return dispatchDockEdit(event);

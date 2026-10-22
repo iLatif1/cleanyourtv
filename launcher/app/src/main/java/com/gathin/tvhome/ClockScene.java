@@ -86,6 +86,9 @@ final class ClockScene {
             }
         }
 
+        TextView prayer = root.findViewById(R.id.dreamPrayerTimes);
+        if (prayer != null && cfg.prayerTimesEnabled) showPrayerTimes(prayer);
+
         if (cfg.hadithEnabled) {
             TextView hadith = root.findViewById(R.id.dreamHadith);
             TextView source = root.findViewById(R.id.dreamHadithSource);
@@ -99,6 +102,37 @@ final class ClockScene {
                 }
             }
         }
+    }
+
+    /** The five prayer times from PrayerTimes (offline, config.xml latitude/longitude); nothing shows without a location. */
+    private void showPrayerTimes(TextView view) {
+        double latitude, longitude;
+        try {
+            latitude = Double.parseDouble(ctx.getString(R.string.latitude));
+            longitude = Double.parseDouble(ctx.getString(R.string.longitude));
+        } catch (NumberFormatException e) {
+            return;   // empty (the default) or not a number
+        }
+        PrayerTimes.Times t = PrayerTimes.today(latitude, longitude, java.time.ZoneId.systemDefault());
+        if (t.fajr == null) return;   // the sun never reaches Fajr's angle here today (high-latitude summer)
+        String[] names = arabic
+                ? new String[]{"الفجر", "الظهر", "العصر", "المغرب", "العشاء"}
+                : new String[]{"Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"};
+        Integer[] minutes = {t.fajr, t.dhuhr, t.asr, t.maghrib, t.isha};
+        StringBuilder line = new StringBuilder();
+        for (int i = 0; i < names.length; i++) {
+            if (minutes[i] == null) continue;
+            if (line.length() > 0) line.append("   ");
+            line.append(names[i]).append(' ').append(clockTime(minutes[i]));
+        }
+        view.setText(line);
+        view.setVisibility(View.VISIBLE);
+    }
+
+    private static String clockTime(int minutesAfterMidnight) {
+        int m = ((minutesAfterMidnight % 1440) + 1440) % 1440;
+        int h = m / 60;
+        return String.format(Locale.US, "%d:%02d", h == 0 ? 12 : h > 12 ? h - 12 : h, m % 60);
     }
 
     /**

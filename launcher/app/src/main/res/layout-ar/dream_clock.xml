@@ -91,6 +91,17 @@
             android:textSize="16sp"
             android:textDirection="locale" />
 
+        <!-- Today's five prayer times (config.xml, prayer_times_enabled), computed offline; set once by ClockScene. -->
+        <TextView
+            android:id="@+id/dreamPrayerTimes"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="right"
+            android:layout_marginTop="6dp"
+            android:textColor="#B3FFFFFF"
+            android:textSize="16sp"
+            android:textDirection="locale" />
+
         <!-- Hadith of the day (config.xml, hadith_enabled), set once by ClockScene; no custom font, so the
              system's own Arabic shaping and tashkeel (diacritic) positioning apply. -->
         <TextView
