@@ -312,40 +312,6 @@
                 android:focusable="false"
                 android:visibility="gone" />
 
-            <!-- Current weather (config.xml, weather_enabled). Gone until the first successful fetch. -->
-            <TextView
-                android:id="@+id/weatherText"
-                android:layout_width="wrap_content"
-                android:layout_below="@id/stats"
-                android:layout_alignStart="@id/leftBlock"
-                android:gravity="right"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
-                android:singleLine="true"
-                android:ellipsize="end"
-                android:textColor="#D9FFFFFF"
-                android:textSize="14sp"
-                android:textDirection="locale"
-                android:focusable="false"
-                android:visibility="gone" />
-
-            <!-- Today's five prayer times (config.xml, prayer_times_enabled), computed offline. -->
-            <TextView
-                android:id="@+id/prayerTimesText"
-                android:layout_width="wrap_content"
-                android:layout_below="@id/weatherText"
-                android:layout_alignStart="@id/leftBlock"
-                android:gravity="right"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
-                android:singleLine="true"
-                android:ellipsize="end"
-                android:textColor="#B3FFFFFF"
-                android:textSize="13sp"
-                android:textDirection="locale"
-                android:focusable="false"
-                android:visibility="gone" />
-
 
             <LinearLayout
                 android:id="@+id/topButtons"

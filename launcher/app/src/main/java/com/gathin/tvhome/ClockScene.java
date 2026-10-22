@@ -9,6 +9,7 @@ import android.os.Looper;
 import android.view.View;
 import android.widget.TextView;
 
+import java.io.File;
 import java.util.Locale;
 import java.util.Random;
 
@@ -30,6 +31,11 @@ final class ClockScene {
     private int colorIndex;
     private int glowColor;
 
+    private final Context ctx;
+    private final boolean weatherEnabled;
+    private final boolean arabic;
+    private final TextView weatherView;
+
     private final Runnable tick = new Runnable() {
         @Override
         public void run() {
@@ -50,32 +56,33 @@ final class ClockScene {
                 glow.setGradientRadius((r - l) * 0.55f));
         colorIndex = random.nextInt(PALETTE.length);
         setGlow(PALETTE[colorIndex]);
-        showIslamicContent(root);
+
+        ctx = root.getContext();
+        Config cfg = Config.load(ctx);
+        arabic = Locale.getDefault().getLanguage().equals("ar");
+        weatherEnabled = cfg.weatherEnabled;
+        weatherView = root.findViewById(R.id.dreamWeather);
+        showIslamicContent(root, cfg);
     }
 
     /**
-     * Hijri date, weather (the last cached reading; the screensaver never touches the network itself)
-     * and hadith of the day, set once: none of these change while the screensaver is up. Views the
-     * layout for this locale does not have (every locale but Arabic and the default) are simply absent,
-     * so this is a no-op there.
+     * Hijri date and hadith of the day, set once: neither changes while the screensaver is up. Weather
+     * shows the last cached reading immediately, then {@link #start} refreshes it if that reading is
+     * stale, the only place in the launcher that fetches weather. Views the layout for this locale does
+     * not have (every locale but Arabic and the default) are simply absent, so this is a no-op there.
      */
-    private void showIslamicContent(View root) {
-        Context ctx = root.getContext();
-        Config cfg = Config.load(ctx);
-        boolean arabic = Locale.getDefault().getLanguage().equals("ar");
-
+    private void showIslamicContent(View root, Config cfg) {
         TextView hijri = root.findViewById(R.id.dreamHijriDate);
         if (hijri != null && cfg.hijriDate) {
             hijri.setText(Hijri.today(arabic));
             hijri.setVisibility(View.VISIBLE);
         }
 
-        TextView weather = root.findViewById(R.id.dreamWeather);
-        if (weather != null && cfg.weatherEnabled) {
+        if (weatherView != null && weatherEnabled) {
             Weather.Reading reading = Weather.cached(Weather.file(ctx));
             if (reading != null) {
-                weather.setText(formatWeather(reading, arabic));
-                weather.setVisibility(View.VISIBLE);
+                weatherView.setText(formatWeather(reading, arabic));
+                weatherView.setVisibility(View.VISIBLE);
             }
         }
 
@@ -94,6 +101,31 @@ final class ClockScene {
         }
     }
 
+    /**
+     * Refreshes the weather on a plain background thread if the cached reading is stale (or there is
+     * none), the way show_stats already reads off the main thread. Weather is fetched here and nowhere
+     * else: Home no longer polls hourly, only the screensaver, and only while it is actually showing.
+     */
+    private void fetchWeatherIfStale() {
+        if (!weatherEnabled || weatherView == null) return;
+        File file = Weather.file(ctx);
+        if (!Weather.stale(Weather.cached(file))) return;
+        double latitude, longitude;
+        try {
+            latitude = Double.parseDouble(ctx.getString(R.string.latitude));
+            longitude = Double.parseDouble(ctx.getString(R.string.longitude));
+        } catch (NumberFormatException e) {
+            return;   // empty (the default) or not a number
+        }
+        new Thread(() -> {
+            Weather.Reading fresh = Weather.refresh(file, latitude, longitude);
+            if (fresh != null) handler.post(() -> {
+                weatherView.setText(formatWeather(fresh, arabic));
+                weatherView.setVisibility(View.VISIBLE);
+            });
+        }, "weather-fetch").start();
+    }
+
     static String formatWeather(Weather.Reading r, boolean arabic) {
         String temp = Math.round(r.temperatureC) + "°";
         return temp + " · " + Weather.description(r.weatherCode, arabic);
@@ -107,6 +139,7 @@ final class ClockScene {
         });
         handler.removeCallbacks(tick);
         handler.postDelayed(tick, MOVE_MS);
+        fetchWeatherIfStale();
     }
 
     void stop() {
