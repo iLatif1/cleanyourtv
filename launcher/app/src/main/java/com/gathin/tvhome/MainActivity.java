@@ -153,8 +153,6 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
     private TextView hijriDate;
     private TextView weatherText;
     private TextView prayerTimesText;
-    private TextView hadithText;
-    private TextView hadithSource;
     private TextView stats;
     private List<RaceWeekend.Race> raceCalendar;
     private View racePanel;
@@ -163,7 +161,6 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
     private boolean showStats;
     private boolean shamsi;
     private boolean hijri;
-    private boolean hadithOn;
     private boolean prayerTimesOn;
     private boolean weatherOn;
     /** Where the TV is (config.xml latitude/longitude), for the weather fetch and the prayer-time maths;
@@ -371,8 +368,6 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
         hijriDate = findViewById(R.id.hijriDate);
         weatherText = findViewById(R.id.weatherText);
         prayerTimesText = findViewById(R.id.prayerTimesText);
-        hadithText = findViewById(R.id.hadithText);
-        hadithSource = findViewById(R.id.hadithSource);
         stats = findViewById(R.id.stats);
         raceCalendar = cfg.raceCalendar;
         racePanel = findViewById(R.id.racePanel);
@@ -389,7 +384,6 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
             date.setPadding(0, (int) (4 * density), 0, 0);
         }
         hijri = cfg.hijriDate;
-        hadithOn = cfg.hadithEnabled;
         prayerTimesOn = cfg.prayerTimesEnabled;
         weatherOn = cfg.weatherEnabled;
         try {
@@ -399,7 +393,6 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
             // empty (the default) or not a number: weather and prayer times both stay off, same as the sky.
         }
         if (hijri) hijriDate.setVisibility(View.VISIBLE);
-        if (hadithOn) showHadith();
         if (prayerTimesOn && !Double.isNaN(latitude)) showPrayerTimes();
         if (weatherOn && !Double.isNaN(latitude)) {
             Weather.Reading cached = Weather.cached(Weather.file(this));
@@ -692,8 +685,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
         rebuildOnResume = false;
         updateGreeting();
         updateRace();
-        // The day may have rolled over while Home was backgrounded: both change at most once a day.
-        if (hadithOn) showHadith();
+        // The day may have rolled over while Home was backgrounded.
         if (prayerTimesOn && !Double.isNaN(latitude)) showPrayerTimes();
         if (weatherOn && !Double.isNaN(latitude)) startWeather();
         // The network and Inputs pills keep their state while Home is in the background, and callbacks update them
@@ -1983,17 +1975,8 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
         return java.util.Locale.getDefault().getLanguage().equals("ar");
     }
 
-    // ---- hadith of the day, prayer times, weather (config.xml hadith_enabled, prayer_times_enabled,
-    // weather_enabled) -------------------------------------------------------------------------------
-
-    private void showHadith() {
-        Hadith.Entry entry = Hadith.today();
-        boolean arabic = isArabic();
-        hadithText.setText(arabic ? entry.arabic : entry.english);
-        hadithText.setVisibility(View.VISIBLE);
-        hadithSource.setText(arabic ? entry.arabicSource : entry.englishSource);
-        hadithSource.setVisibility(View.VISIBLE);
-    }
+    // ---- prayer times, weather (config.xml prayer_times_enabled, weather_enabled; hadith of the day is
+    // Clock-screensaver only, see ClockScene) ---------------------------------------------------------
 
     private void showPrayerTimes() {
         PrayerTimes.Times t = PrayerTimes.today(latitude, longitude, java.time.ZoneId.systemDefault());

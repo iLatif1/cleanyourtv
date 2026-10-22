@@ -346,45 +346,6 @@
                 android:focusable="false"
                 android:visibility="gone" />
 
-            <!-- Hadith of the day (config.xml, hadith_enabled): the Arabic text as narrated, with its source.
-                 Full width so a long one wraps instead of running under the grid; no custom font, so the
-                 system's own Arabic shaping and tashkeel (diacritic) positioning apply, which @font/outfit
-                 does not cover. -->
-            <TextView
-                android:id="@+id/hadithText"
-                android:layout_width="match_parent"
-                android:layout_below="@id/prayerTimesText"
-                android:layout_alignStart="@id/leftBlock"
-                android:gravity="right"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:layout_marginStart="40dp"
-                android:maxLines="3"
-                android:ellipsize="end"
-                android:lineSpacingExtra="4dp"
-                android:textColor="#CCFFFFFF"
-                android:textSize="15sp"
-                android:textDirection="locale"
-                android:focusable="false"
-                android:visibility="gone" />
-
-            <!-- The hadith's source line ("رواه البخاري ١"). -->
-            <TextView
-                android:id="@+id/hadithSource"
-                android:layout_width="wrap_content"
-                android:layout_below="@id/hadithText"
-                android:layout_alignStart="@id/leftBlock"
-                android:gravity="right"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
-                android:singleLine="true"
-                android:ellipsize="end"
-                android:textColor="#80FFFFFF"
-                android:textSize="12sp"
-                android:textDirection="locale"
-                android:letterSpacing="0.04"
-                android:focusable="false"
-                android:visibility="gone" />
 
             <LinearLayout
                 android:id="@+id/topButtons"
