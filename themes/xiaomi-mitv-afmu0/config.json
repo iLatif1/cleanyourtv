@@ -1,0 +1,13 @@
+{
+  "dock_apps": [
+    "com.google.android.youtube.tv",
+    "com.netflix.ninja",
+    "net.mbc.shahidTV",
+    "com.disneyplus.mea",
+    "com.mbm_soft.aroma4kitv"
+  ],
+  "columns": 5,
+  "live_tv_package": "com.mbm_soft.aroma4kitv",
+  "weather_enabled": true,
+  "hijri_date": true
+}

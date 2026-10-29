@@ -8,6 +8,10 @@
 # Tested for one evening so far (Home, grid, D-pad, dock apps) and across one reboot: the disabled list and the
 # default home survive it. Not lived with for days yet.
 #
+# Second box (192.168.1.18, wireless debugging, 2026-10-29): applied with setupwraith disabled only after the Wi-Fi network was
+# forgotten and re-joined (new entry owned by uid 1000), then launcher v2.5-8 installed and launcherx disabled. Home, Back, Input,
+# YouTube, Netflix, mic and Settings buttons worked with InputKeyService + HomeKeyService. Theme: themes/xiaomi-mitv-afmu0.
+#
 # Notes from this box:
 # - The stock home is com.google.android.apps.tv.launcherx. launcher/build-and-install.sh disables it.
 # - setupwraith's RecoveryActivity (HOME priority 1, launcherx 2, a sideloaded launcher 0) takes Home once
@@ -39,9 +43,10 @@ com.mitv.tvhome.oemtab
 com.xm.webcontent
 android.autoinstalls.config.soc.amlogic
 
-# Personal choice: voice assistant, phone remote, Mi cast/share (the mic button stops working)
-com.google.android.katniss
-com.google.android.tv.remote.service
+# Personal choice: Mi cast/share. The voice assistant (katniss) and the phone remote service are kept enabled here
+# (the mic button and Google Home remote keep working); uncomment them to disable.
+# com.google.android.katniss
+# com.google.android.tv.remote.service
 com.xiaomi.mitv.smartshare
 com.xiaomi.wfdsinkhelperservice
 com.xiaomi.mi_connect_service
@@ -64,7 +69,7 @@ com.mitv.gallery
 # com.amazon.amazonvideo.livingroom    # Prime Video
 
 # Optional, uncomment if unused
-# com.google.android.apps.tv.dreamx    # Google ambient screensaver (switch to the Clock dream first)
+com.google.android.apps.tv.dreamx    # Google ambient screensaver; the screensaver here is the launcher's ClockDream
 
 # Setup wizard, takes Home after the stock launcher is disabled
 com.google.android.tungsten.setupwraith
