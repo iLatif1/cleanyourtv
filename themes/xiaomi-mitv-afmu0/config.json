@@ -9,5 +9,6 @@
   "columns": 5,
   "live_tv_package": "com.mbm_soft.aroma4kitv",
   "weather_enabled": true,
-  "hijri_date": true
+  "hijri_date": true,
+  "hadith_enabled": false
 }
